@@ -9,15 +9,30 @@ url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
 # Define the series IDs (e.g., non-farm workers and unemployment rate)
 series_ids = [
-    "SMS31000000000000001", # total nonfarm NE
-    "LASST370000000000008" # labor force participation NC
-    "LASST310000000000003", # unemp. rate Neb.
-    "BDS0000001000000000110004LQ5" #Gross Job Losses AL
+    "SMS31000000000000001",  # Total nonfarm NE
+    "LASST370000000000008",  # Labor force participation NC
+    "LASST310000000000003",  # Unemployment rate Neb.
+    "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
 ]
 
-# Local file path to save the data (e.g., CSV file)
-local_data_file = "bls_data.csv"
+# Mapping for `series_id` to their human-readable labels
+series_id_labels = {
+    "SMS31000000000000001": "Total Nonfarm, NE",
+    "LASST370000000000008": "Labor Force Participation, NC",
+    "LASST310000000000003": "Unemployment Rate, NE",
+    "BDS0000001000000000110004LQ5": "Gross Job Losses, AL"
+}
 
+# Local file path to save the data (e.g., CSV file)
+local_data_file = "bls_data_new.csv"
+
+# Map for converting quarter strings to month names
+quarter_to_month = {
+    "1st Quarter": "March",
+    "2nd Quarter": "June",
+    "3rd Quarter": "September",
+    "4th Quarter": "December"
+}
 
 # Fetch data from the BLS API
 def fetch_bls_data(start_year, end_year):
@@ -48,9 +63,24 @@ def process_bls_data(data):
     # Extract relevant data from the response
     for series in data["Results"]["series"]:
         series_id = series["seriesID"]
+        label = series_id_labels.get(series_id, "Unknown Label")  # Get the label for the series_id, default to "Unknown Label"
+        
         for item in series["data"]:
+            # Check if the period is a quarter or a month
+            if item['periodName'] in quarter_to_month:
+                # Convert the quarter to a month name (e.g., "1st Quarter" -> "March")
+                month_name = quarter_to_month[item['periodName']]
+                date_str = f"{item['year']} {month_name}"
+            else:
+                # If it's a month name, use it directly
+                date_str = f"{item['year']} {item['periodName']}"
+
+            # Convert the date string to a datetime object
+            date = datetime.strptime(date_str, "%Y %B")
             all_data.append({
                 "series_id": series_id,
+                "label": label,  # Add the label to each record
+                "date": date,
                 "value": float(item["value"])
             })
 
@@ -62,7 +92,7 @@ def load_local_data(file_path):
     if os.path.exists(file_path):
         return pd.read_csv(file_path, parse_dates=["date"])
     else:
-        return pd.DataFrame(columns=["series_id", "date", "value"])
+        return pd.DataFrame(columns=["series_id", "label", "date", "value"])
 
 
 # Save the data to a CSV file
