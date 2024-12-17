@@ -2,22 +2,42 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# List of CSV files to load
 local_data_files = ["bls_data_.csv", "bls_labor_force.csv", "Unemployment_rate.csv"]
 
+# Title of the app
 st.title('BLS Data Dashboard')
 
-fig, ax = plt.subplots(figsize=(12, 6))
-for series_id in data["series_id"].unique():
-    series_data = data[data["series_id"] == series_id]
-    ax.plot(series_data["date"], series_data["value"], label=series_id)
+# Initialize an empty DataFrame to combine all data
+data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
 
-ax.set_title('BLS Data')
-ax.set_xlabel('Date')
-ax.set_ylabel('Value')
-ax.legend()
-ax.grid(True)
+# Load data from each CSV file and combine them
+for file in local_data_files:
+    if os.path.exists(file):  # Ensure file exists before loading
+        local_data = pd.read_csv(file, parse_dates=["date"])
+        data = pd.concat([data, local_data])
 
-st.pyplot(fig)
+# Check if the data is not empty
+if not data.empty:
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-st.subheader("Raw Data")
-st.write(data)
+    # Plot each series' data
+    for series_id in data["series_id"].unique():
+        series_data = data[data["series_id"] == series_id]
+        ax.plot(series_data["date"], series_data["value"], label=series_id)
+
+    ax.set_title('BLS Data')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Value')
+    ax.legend()
+    ax.grid(True)
+
+    # Display the plot
+    st.pyplot(fig)
+
+    # Display raw data
+    st.subheader("Raw Data")
+    st.write(data)
+else:
+    st.error("No data available to display.")
