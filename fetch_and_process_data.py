@@ -4,14 +4,14 @@ import pandas as pd
 from datetime import datetime
 
 # API key and BLS endpoint URL
-api_key = "86b67e98f5134a7386ce62902a756492"  # Make sure to replace with your actual API key
+api_key = "86b67e98f5134a7386ce62902a756492"  # Replace with your actual API key
 url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
 # Define the series IDs (e.g., non-farm workers and unemployment rate)
 series_ids = [
     "SMS31000000000000001",  # Total nonfarm NE
     "LASST370000000000008",  # Labor force participation NC
-    "LASST310000000000003", # Unemployment rate Neb.
+    "LASST310000000000003",  # Unemployment rate Neb.
     "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
 ]
 
@@ -23,10 +23,8 @@ series_id_labels = {
     "BDS0000001000000000110004LQ5": "Gross Job Losses, AL"
 }
 
-# Local file path to save the data (e.g., CSV file)
-local_data_file = "bls_data_.csv"
-local_data_file1 = "bls_labor_force.csv"
-local_data_file2 = "Unemployment_rate.csv"
+# Local file paths to save the data (e.g., CSV files)
+local_data_files = ["bls_data_.csv", "bls_labor_force.csv", "Unemployment_rate.csv"]
 
 # Map for converting quarter strings to month names
 quarter_to_month = {
@@ -56,7 +54,6 @@ def fetch_bls_data(start_year, end_year):
         print("HTTP Error:", response.status_code)
 
     return None
-
 
 # Process the fetched data and return as a DataFrame
 def process_bls_data(data):
@@ -88,7 +85,6 @@ def process_bls_data(data):
 
     return pd.DataFrame(all_data)
 
-
 # Load existing local data if available
 def load_local_data(file_path):
     if os.path.exists(file_path):
@@ -96,15 +92,17 @@ def load_local_data(file_path):
     else:
         return pd.DataFrame(columns=["label", "series_id", "date", "value"])
 
-
 # Save the data to a CSV file
 def save_local_data(data, file_path):
     data.to_csv(file_path, index=False)
 
-
 # Main function to update data and save it locally
 def update_data():
-    local_data = load_local_data(local_data_file)
+    # Load data from all CSV files
+    combined_data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
+    for file in local_data_files:
+        local_data = load_local_data(file)
+        combined_data = pd.concat([combined_data, local_data])
 
     # Set start year to 2022
     start_year = 2022
@@ -119,10 +117,14 @@ def update_data():
         new_data_df = process_bls_data(new_data)
 
         # Combine existing data with new data (and remove duplicates)
-        combined_data = pd.concat([local_data, new_data_df]).drop_duplicates()
+        combined_data = pd.concat([combined_data, new_data_df]).drop_duplicates()
 
-        # Save the updated data back to the CSV file
-        save_local_data(combined_data, local_data_file)
+        # Save the updated data back to each CSV file
+        for file in local_data_files:
+            save_local_data(combined_data, file)
         print("Data updated successfully.")
     else:
         print("No new data fetched.")
+
+# Run the update function
+update_data()
