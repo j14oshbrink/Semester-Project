@@ -1,0 +1,35 @@
+name: Streamlit App Update
+
+on:
+  push:
+    branches:
+      - main  # This triggers the workflow when changes are pushed to the 'main' branch
+  schedule:
+    - cron: '0 0 1 * *'  # This triggers the workflow once a month on the 1st day at midnight
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3  # This checks out your code from the GitHub repo
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8  # Specify the Python version for the workflow
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Install the required dependencies (e.g., streamlit, pandas)
+
+    - name: Run the Python script to fetch and process data
+      run: |
+        python fetch_and_process_data.py  # Run the script that fetches and processes your data
+
+    - name: Deploy to Streamlit
+      run: |
+        streamlit run app.py  # Runs your Streamlit app (make sure this is your app entry file)
+
