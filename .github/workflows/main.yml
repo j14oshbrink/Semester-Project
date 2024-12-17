@@ -31,5 +31,5 @@ jobs:
 
     - name: Deploy to Streamlit
       run: |
-        streamlit run semester_project_code (3).py  # Runs your Streamlit app (make sure this is your app entry file)
+        streamlit run semester_project_code.py  # Runs your Streamlit app (make sure this is your app entry file)
 
