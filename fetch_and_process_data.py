@@ -11,8 +11,7 @@ url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 series_ids = [
     "SMS31000000000000001",  # Total nonfarm NE
     "LASST370000000000008",  # Labor force participation NC
-    "LASST310000000000003", 
-    "LASST31000000000003"# Unemployment rate Neb.
+    "LASST310000000000003", # Unemployment rate Neb.
     "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
 ]
 
@@ -26,6 +25,8 @@ series_id_labels = {
 
 # Local file path to save the data (e.g., CSV file)
 local_data_file = "bls_data_.csv"
+local_data_file1 = "bls_labor_force.csv"
+local_data_file2 = "Unemployment_rate.csv"
 
 # Map for converting quarter strings to month names
 quarter_to_month = {
