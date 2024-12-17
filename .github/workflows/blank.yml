@@ -46,8 +46,3 @@ jobs:
       run: |
         curl -X POST -d "" https://api.streamlit.io/v1/deployments/your-deployment-id
         # Replace with the correct Streamlit API endpoint and deployment ID
-        python update_data.py
-        import requests
-        import pandas
-        import matplotlib
-        import streamlit
