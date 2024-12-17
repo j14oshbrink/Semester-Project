@@ -13,20 +13,18 @@ import pandas as pd
 from datetime import datetime
 
 # API key and BLS endpoint URL
-api_key = "86b67e98f5134a7386ce62902a756492"  # Make sure to replace with your actual API key
+api_key = "86b67e98f5134a7386ce62902a756492"  
 url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
 # Define the series IDs (e.g., non-farm workers and unemployment rate)
 series_ids = [
-    "CES0000000001",  # Example series ID for non-farm workers
-    "LNS14000000"     # Example series ID for unemployment rate
+    "CES0000000001",  
+    "LNS14000000"     
 ]
 
-# Local file path to save the data (e.g., CSV file)
 local_data_file = "bls_data.csv"
 
 
-# Fetch data from the BLS API
 def fetch_bls_data(start_year, end_year):
     payload = {
         "seriesid": series_ids,
@@ -48,11 +46,9 @@ def fetch_bls_data(start_year, end_year):
     return None
 
 
-# Process the fetched data and return as a DataFrame
 def process_bls_data(data):
     all_data = []
 
-    # Extract relevant data from the response
     for series in data["Results"]["series"]:
         series_id = series["seriesID"]
         for item in series["data"]:
@@ -65,7 +61,6 @@ def process_bls_data(data):
     return pd.DataFrame(all_data)
 
 
-# Load existing local data if available
 def load_local_data(file_path):
     if os.path.exists(file_path):
         return pd.read_csv(file_path, parse_dates=["date"])
@@ -73,41 +68,33 @@ def load_local_data(file_path):
         return pd.DataFrame(columns=["series_id", "date", "value"])
 
 
-# Save the data to a CSV file
 def save_local_data(data, file_path):
     data.to_csv(file_path, index=False)
 
 
-# Main function to update data and save it locally
 def update_data():
     local_data = load_local_data(local_data_file)
 
-    # If there's existing data, get the latest year; otherwise, fetch from the current year
     if not local_data.empty:
         latest_date = local_data["date"].max()
         start_year = latest_date.year
     else:
         start_year = datetime.now().year
 
-    # Set the end year to the current year
     end_year = datetime.now().year
 
-    # Fetch new data from the API
     new_data = fetch_bls_data(start_year, end_year)
 
     if new_data:
         new_data_df = process_bls_data(new_data)
 
-        # Combine existing data with new data (and remove duplicates)
         combined_data = pd.concat([local_data, new_data_df]).drop_duplicates()
 
-        # Save the updated data back to the CSV file
         save_local_data(combined_data, local_data_file)
         print("Data updated successfully.")
     else:
         print("No new data fetched.")
 
 
-# Run the update data function
 if __name__ == "__main__":
     update_data()
