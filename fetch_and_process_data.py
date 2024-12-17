@@ -11,7 +11,8 @@ url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 series_ids = [
     "SMS31000000000000001",  # Total nonfarm NE
     "LASST370000000000008",  # Labor force participation NC
-    "LASST310000000000003",  # Unemployment rate Neb.
+    "LASST310000000000003", 
+    "LASST31000000000003"# Unemployment rate Neb.
     "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
 ]
 
@@ -24,7 +25,7 @@ series_id_labels = {
 }
 
 # Local file path to save the data (e.g., CSV file)
-local_data_file = "bls_data_new.csv"
+local_data_file = "bls_data_.csv"
 
 # Map for converting quarter strings to month names
 quarter_to_month = {
@@ -64,7 +65,7 @@ def process_bls_data(data):
     for series in data["Results"]["series"]:
         series_id = series["seriesID"]
         label = series_id_labels.get(series_id, "Unknown Label")  # Get the label for the series_id, default to "Unknown Label"
-        
+
         for item in series["data"]:
             # Check if the period is a quarter or a month
             if item['periodName'] in quarter_to_month:
@@ -92,7 +93,7 @@ def load_local_data(file_path):
     if os.path.exists(file_path):
         return pd.read_csv(file_path, parse_dates=["date"])
     else:
-        return pd.DataFrame(columns=["series_id", "label", "date", "value"])
+        return pd.DataFrame(columns=["label", "series_id", "date", "value"])
 
 
 # Save the data to a CSV file
@@ -104,12 +105,8 @@ def save_local_data(data, file_path):
 def update_data():
     local_data = load_local_data(local_data_file)
 
-    # If there's existing data, get the latest year; otherwise, fetch from the current year
-    if not local_data.empty:
-        latest_date = local_data["date"].max()
-        start_year = latest_date.year
-    else:
-        start_year = datetime.now().year
+    # Set start year to 2022
+    start_year = 2022
 
     # Set the end year to the current year
     end_year = datetime.now().year
@@ -128,8 +125,3 @@ def update_data():
         print("Data updated successfully.")
     else:
         print("No new data fetched.")
-
-
-# Run the update data function
-if __name__ == "__main__":
-    update_data()
