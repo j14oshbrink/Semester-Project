@@ -27,9 +27,9 @@ jobs:
 
     - name: Run the Python script to fetch and process data
       run: |
-        python fetch_and_process_data.py  # Run the script that fetches and processes your data
+        python semester_project_code (2).py  # Run the script that fetches and processes your data
 
     - name: Deploy to Streamlit
       run: |
-        streamlit run app.py  # Runs your Streamlit app (make sure this is your app entry file)
+        streamlit run semester_project_code (2).py  # Runs your Streamlit app (make sure this is your app entry file)
 
