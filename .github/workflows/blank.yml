@@ -48,23 +48,6 @@ jobs:
         # Replace with the correct Streamlit API endpoint and deployment ID
         python update_data.py
         import requests
-import pandas as pd
-from datetime import datetime
-
-def fetch_and_process_data():
-    # Your data collection logic here
-    pass
-
-def main():
-    # Fetch new data, process it, and save it
-    fetch_and_process_data()
-
-if __name__ == "__main__":
-    main()
-    requests
-pandas
-matplotlib
-streamlit
 
 
 
