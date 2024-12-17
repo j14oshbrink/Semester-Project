@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("bls_data.csv")  # Replace with the path to your data file
+data = pd.read_csv("bls_data.csv")  
 
 st.title('BLS Data Dashboard')
 
