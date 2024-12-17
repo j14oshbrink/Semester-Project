@@ -18,12 +18,17 @@ for file in local_data_files:
         local_data = pd.read_csv(file)
         print(f"Columns in {file}: {local_data.columns}")  # Print columns to debug
 
-        # Check if 'date' column exists before parsing it
+        # Check if 'date' or other date-related column exists
         if 'date' in local_data.columns:
-            local_data['date'] = pd.to_datetime(local_data['date'], errors='coerce')  # Parse dates, handle errors
-            data = pd.concat([data, local_data])
+            local_data['date'] = pd.to_datetime(local_data['date'], errors='coerce')  # Parse dates
+        elif 'period' in local_data.columns:  # Adjust based on your data file structure
+            local_data['date'] = pd.to_datetime(local_data['period'], errors='coerce')
         else:
-            st.warning(f"File {file} does not contain a 'date' column.")
+            st.warning(f"File {file} does not contain a 'date' or 'period' column.")
+
+        # If the date was successfully added or found, concatenate the data
+        if 'date' in local_data.columns:
+            data = pd.concat([data, local_data])
 
 # Check if the data is not empty
 if not data.empty:
