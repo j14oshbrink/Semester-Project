@@ -12,19 +12,40 @@ st.title('BLS Data Dashboard')
 # Initialize an empty DataFrame to combine all data
 data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
 
+# Define series labels and IDs for each CSV file (this should be adjusted based on the actual data)
+series_info = {
+    "bls_data_.csv": {"label": "Total Nonfarm Employment", "series_id": "SMS31000000000000001"},
+    "bls_labor_force.csv": {"label": "Labor Force Participation", "series_id": "LASST370000000000008"},
+    "Unemployment_rate.csv": {"label": "Unemployment Rate", "series_id": "LASST310000000000003"}
+}
+
 # Load data from each CSV file and combine them
 for file in local_data_files:
     if os.path.exists(file):  # Ensure file exists before loading
         local_data = pd.read_csv(file)
         print(f"Columns in {file}: {local_data.columns}")  # Print columns to debug
 
-        # Check if 'date' or other date-related column exists
+        # Add 'label' and 'series_id' columns
+        local_data['label'] = series_info[file]["label"]
+        local_data['series_id'] = series_info[file]["series_id"]
+
+        # Attempt to create the 'date' column if not already present
         if 'date' in local_data.columns:
             local_data['date'] = pd.to_datetime(local_data['date'], errors='coerce')  # Parse dates
         elif 'period' in local_data.columns:  # Adjust based on your data file structure
             local_data['date'] = pd.to_datetime(local_data['period'], errors='coerce')
         else:
-            st.warning(f"File {file} does not contain a 'date' or 'period' column.")
+            # Manually add a date if no date column exists
+            if 'year' in local_data.columns:
+                # Assuming the file contains a 'year' column, create a date for the year
+                local_data['date'] = pd.to_datetime(local_data['year'], format='%Y')
+            else:
+                st.warning(f"File {file} does not contain a 'date' or 'period' column and no 'year' column found.")
+
+        # Ensure that we have 'value' column and set it if missing
+        if 'value' not in local_data.columns:
+            # Assuming the last column in the file contains the 'value' data
+            local_data['value'] = local_data.iloc[:, -1]  # Get last column as value (adjust if needed)
 
         # If the date was successfully added or found, concatenate the data
         if 'date' in local_data.columns:
