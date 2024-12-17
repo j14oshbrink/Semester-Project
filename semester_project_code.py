@@ -2,9 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("bls_data.csv") 
-data = pd.read_csv("bls_labor_force.csv")
-data = pd.read_csv("Unemployment_rate.csv")
+local_data_files = ["bls_data_.csv", "bls_labor_force.csv", "Unemployment_rate.csv"]
 
 st.title('BLS Data Dashboard')
 
