@@ -14,7 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load your processed data
-data = pd.read_csv("bls_data.csv")  # Replace with the path to your data file
+data = pd.read_csv("bls_data.csv") 
 
 # Streamlit app layout
 st.title('BLS Data Dashboard')
@@ -31,7 +31,6 @@ ax.set_ylabel('Value')
 ax.legend()
 ax.grid(True)
 
-# Display the plot in Streamlit
 st.pyplot(fig)
 
 # Optionally display the raw data
