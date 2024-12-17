@@ -1,130 +1,71 @@
 import os
-import requests
+import streamlit as st
 import pandas as pd
-from datetime import datetime
+import matplotlib.pyplot as plt
 
-# API key and BLS endpoint URL
-api_key = "86b67e98f5134a7386ce62902a756492"  # Replace with your actual API key
-url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-
-# Define the series IDs (e.g., non-farm workers and unemployment rate)
-series_ids = [
-    "SMS31000000000000001",  # Total nonfarm NE
-    "LASST370000000000008",  # Labor force participation NC
-    "LASST310000000000003",  # Unemployment rate Neb.
-    "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
-]
-
-# Mapping for `series_id` to their human-readable labels
-series_id_labels = {
-    "SMS31000000000000001": "Total Nonfarm, NE",
-    "LASST370000000000008": "Labor Force Participation, NC",
-    "LASST310000000000003": "Unemployment Rate, NE",
-    "BDS0000001000000000110004LQ5": "Gross Job Losses, AL"
-}
-
-# Local file paths to save the data (e.g., CSV files)
+# List of CSV files to load
 local_data_files = ["bls_data_.csv", "bls_labor_force.csv", "Unemployment_rate.csv"]
 
-# Map for converting quarter strings to month names
-quarter_to_month = {
-    "1st Quarter": "March",
-    "2nd Quarter": "June",
-    "3rd Quarter": "September",
-    "4th Quarter": "December"
+# Title of the app
+st.title('BLS Data Dashboard')
+
+# Initialize an empty DataFrame to combine all data
+data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
+
+# Define series labels and IDs for each CSV file (this should be adjusted based on the actual data)
+series_info = {
+    "bls_data_.csv": {"label": "Total Nonfarm Employment", "series_id": "SMS31000000000000001"},
+    "bls_labor_force.csv": {"label": "Labor Force Participation", "series_id": "LASST370000000000008"},
+    "Unemployment_rate.csv": {"label": "Unemployment Rate", "series_id": "LASST310000000000003"}
 }
 
-# Fetch data from the BLS API
-def fetch_bls_data(start_year, end_year):
-    payload = {
-        "seriesid": series_ids,
-        "startyear": start_year,
-        "endyear": end_year,
-        "registrationkey": api_key
-    }
-    response = requests.post(url, json=payload)
+# Load data from each CSV file and combine them
+for file in local_data_files:
+    if os.path.exists(file):  # Ensure file exists before loading
+        local_data = pd.read_csv(file)
+        print(f"Columns in {file}: {local_data.columns}")  # Print columns to debug
 
-    if response.status_code == 200:
-        data = response.json()
-        if data.get("status") == "REQUEST_SUCCEEDED":
-            return data
+        # Add 'label' and 'series_id' columns
+        local_data['label'] = series_info[file]["label"]
+        local_data['series_id'] = series_info[file]["series_id"]
+
+        # Check if 'date' or other date-related column exists
+        if 'date' in local_data.columns:
+            local_data['date'] = pd.to_datetime(local_data['date'], errors='coerce')  # Parse dates
+        elif 'period' in local_data.columns:  # Adjust based on your data file structure
+            local_data['date'] = pd.to_datetime(local_data['period'], errors='coerce')
         else:
-            print("Error:", data.get("message"))
-    else:
-        print("HTTP Error:", response.status_code)
+            st.warning(f"File {file} does not contain a 'date' or 'period' column.")
 
-    return None
+        # Ensure that we have 'value' column and set it if missing
+        if 'value' not in local_data.columns:
+            local_data['value'] = local_data.iloc[:, -1]  # Assuming the last column is the value column
 
-# Process the fetched data and return as a DataFrame
-def process_bls_data(data):
-    all_data = []
+        # If the date was successfully added or found, concatenate the data
+        if 'date' in local_data.columns:
+            data = pd.concat([data, local_data])
 
-    # Extract relevant data from the response
-    for series in data["Results"]["series"]:
-        series_id = series["seriesID"]
-        label = series_id_labels.get(series_id, "Unknown Label")  # Get the label for the series_id, default to "Unknown Label"
+# Check if the data is not empty
+if not data.empty:
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-        for item in series["data"]:
-            # Check if the period is a quarter or a month
-            if item['periodName'] in quarter_to_month:
-                # Convert the quarter to a month name (e.g., "1st Quarter" -> "March")
-                month_name = quarter_to_month[item['periodName']]
-                date_str = f"{item['year']} {month_name}"
-            else:
-                # If it's a month name, use it directly
-                date_str = f"{item['year']} {item['periodName']}"
+    # Plot each series' data
+    for series_id in data["series_id"].unique():
+        series_data = data[data["series_id"] == series_id]
+        ax.plot(series_data["date"], series_data["value"], label=series_id)
 
-            # Convert the date string to a datetime object
-            date = datetime.strptime(date_str, "%Y %B")
-            all_data.append({
-                "series_id": series_id,
-                "label": label,  # Add the label to each record
-                "date": date,
-                "value": float(item["value"])
-            })
+    ax.set_title('BLS Data')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Value')
+    ax.legend()
+    ax.grid(True)
 
-    return pd.DataFrame(all_data)
+    # Display the plot
+    st.pyplot(fig)
 
-# Load existing local data if available
-def load_local_data(file_path):
-    if os.path.exists(file_path):
-        return pd.read_csv(file_path, parse_dates=["date"])
-    else:
-        return pd.DataFrame(columns=["label", "series_id", "date", "value"])
-
-# Save the data to a CSV file
-def save_local_data(data, file_path):
-    data.to_csv(file_path, index=False)
-
-# Main function to update data and save it locally
-def update_data():
-    # Load data from all CSV files
-    combined_data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
-    for file in local_data_files:
-        local_data = load_local_data(file)
-        combined_data = pd.concat([combined_data, local_data])
-
-    # Set start year to 2022
-    start_year = 2022
-
-    # Set the end year to the current year
-    end_year = datetime.now().year
-
-    # Fetch new data from the API
-    new_data = fetch_bls_data(start_year, end_year)
-
-    if new_data:
-        new_data_df = process_bls_data(new_data)
-
-        # Combine existing data with new data (and remove duplicates)
-        combined_data = pd.concat([combined_data, new_data_df]).drop_duplicates()
-
-        # Save the updated data back to each CSV file
-        for file in local_data_files:
-            save_local_data(combined_data, file)
-        print("Data updated successfully.")
-    else:
-        print("No new data fetched.")
-
-# Run the update function
-update_data()
+    # Display raw data
+    st.subheader("Raw Data")
+    st.write(data)
+else:
+    st.error("No data available to display.")
