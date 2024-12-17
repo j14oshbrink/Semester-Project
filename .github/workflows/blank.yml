@@ -48,6 +48,9 @@ jobs:
         # Replace with the correct Streamlit API endpoint and deployment ID
         python update_data.py
         import requests
+        import pandas
+        import matplotlib
+        import streamlit
 
 
 
