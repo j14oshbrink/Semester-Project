@@ -15,8 +15,15 @@ data = pd.DataFrame(columns=["label", "series_id", "date", "value"])
 # Load data from each CSV file and combine them
 for file in local_data_files:
     if os.path.exists(file):  # Ensure file exists before loading
-        local_data = pd.read_csv(file, parse_dates=["date"])
-        data = pd.concat([data, local_data])
+        local_data = pd.read_csv(file)
+        print(f"Columns in {file}: {local_data.columns}")  # Print columns to debug
+
+        # Check if 'date' column exists before parsing it
+        if 'date' in local_data.columns:
+            local_data['date'] = pd.to_datetime(local_data['date'], errors='coerce')  # Parse dates, handle errors
+            data = pd.concat([data, local_data])
+        else:
+            st.warning(f"File {file} does not contain a 'date' column.")
 
 # Check if the data is not empty
 if not data.empty:
