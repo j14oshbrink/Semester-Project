@@ -3,16 +3,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 
-# Load the data from CSV files
+# Here is where I will be getting the csv files from the data. Each set will be its own to have separate graphs.
 bls_data = pd.read_csv("bls_data.csv")
 bls_labor_force = pd.read_csv("bls_labor_force.csv")
 unemployment_rate = pd.read_csv("Unemployment_rate.csv")
-employment_population_ratio = pd.read_csv("employment_population_ratio.csv")  # Make sure to load this file as well
+employment_population_ratio = pd.read_csv("employment_population_ratio.csv")
 
-# Set the title of the Streamlit app
+
 st.title("BLS Data Dashboard")
 
-# Visualizing Total Nonfarm Employment Data (Line plot)
+# I am going to put my visual coding for each graph below
 st.subheader("Total Nonfarm Employment")
 if not bls_data.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -28,7 +28,7 @@ if not bls_data.empty:
 else:
     st.warning("No data available for Total Nonfarm Employment.")
 
-# Visualizing Labor Force Participation Data (Bar chart)
+# Using a bar chart for Labor Force Participation (Bar chart)
 st.subheader("Labor Force Participation")
 if not bls_labor_force.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -44,7 +44,7 @@ if not bls_labor_force.empty:
 else:
     st.warning("No data available for Labor Force Participation.")
 
-# Visualizing Unemployment Rate Data (Line plot)
+# Unemployment rate Line plot
 st.subheader("Unemployment Rate")
 if not unemployment_rate.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -60,7 +60,7 @@ if not unemployment_rate.empty:
 else:
     st.warning("No data available for Unemployment Rate.")
     
-# Visualizing Employment Population Ratio Data (Line plot)
+# Employment population ratio line plot
 st.subheader("Employment Population Ratio")
 if not employment_population_ratio.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -76,7 +76,7 @@ if not employment_population_ratio.empty:
 else:
     st.warning("No data available for Employment Population Ratio.")
 
-# Optionally, display raw data for each dataset
+#This will display the raw data sets as well
 st.subheader("Raw Data: Total Nonfarm Employment")
 st.write(bls_data)
 
