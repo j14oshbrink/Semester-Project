@@ -12,14 +12,15 @@ series_ids = [
     "SMS31000000000000001",  # Total nonfarm NE
     "LASST370000000000008",  # Labor force participation NC
     "LASST310000000000003",  # Unemployment rate Neb.
-    "BDS0000001000000000110004LQ5"  # Gross Job Losses AL
+    "LAUST310000000000007" #Employment-Population Ratio: Nebraska (U
 ]
 
 # File paths for saving the data
 data_files = {
     "bls_data": "bls_data.csv",
     "bls_labor_force": "bls_labor_force.csv",
-    "unemployment_rate": "Unemployment_rate.csv"
+    "unemployment_rate": "Unemployment_rate.csv",
+    "employment_population_ratio": "employment_population_ratio.csv"
 }
 
 # Function to fetch data from BLS API
@@ -96,6 +97,10 @@ def update_data():
         # Saving Unemployment Rate data
         unemployment_rate_data = processed_data[processed_data["series_id"] == "LASST310000000000003"]
         save_data_to_csv(unemployment_rate_data, data_files["unemployment_rate"])
+
+        #Saving employment population ratio
+        employment_population_ratio_data = processed_data[processed_data["series_id"] == "LAUST310000000000007"]
+        save_data_to_csv(employment_population_ratio_data, data_files["employment_population_ratio"])
 
         print("Data updated and saved successfully.")
     else:
