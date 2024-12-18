@@ -34,7 +34,7 @@ if not bls_labor_force.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
     for series_id in bls_labor_force["series_id"].unique():
         series_data = bls_labor_force[bls_labor_force["series_id"] == series_id]
-        ax.bar(pd.to_datetime(series_data["date"]), series_data["value"], label=series_id)
+        ax.plot(pd.to_datetime(series_data["date"]), series_data["value"], label=series_id)
     ax.set_title('Labor Force Participation over Time')
     ax.set_xlabel('Date')
     ax.set_ylabel('Participation Rate')
