@@ -7,6 +7,7 @@ import streamlit as st
 bls_data = pd.read_csv("bls_data.csv")
 bls_labor_force = pd.read_csv("bls_labor_force.csv")
 unemployment_rate = pd.read_csv("Unemployment_rate.csv")
+employment_population_ratio = pd.read_csv("employment_population_ratio.csv")  # Make sure to load this file as well
 
 # Set the title of the Streamlit app
 st.title("BLS Data Dashboard")
@@ -59,20 +60,21 @@ if not unemployment_rate.empty:
 else:
     st.warning("No data available for Unemployment Rate.")
     
-st.subheader("employment_population_ratio.csv")
+# Visualizing Employment Population Ratio Data (Line plot)
+st.subheader("Employment Population Ratio")
 if not employment_population_ratio.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
     for series_id in employment_population_ratio["series_id"].unique():
         series_data = employment_population_ratio[employment_population_ratio["series_id"] == series_id]
         ax.plot(pd.to_datetime(series_data["date"]), series_data["value"], label=series_id)
-    ax.set_title('Employment Population Ratio')
+    ax.set_title('Employment Population Ratio over Time')
     ax.set_xlabel('Date')
-    ax.set_ylabel('Unemployment Rate (%)')
+    ax.set_ylabel('Employment Population Ratio (%)')
     ax.legend()
     ax.grid(True)
     st.pyplot(fig)
 else:
-    st.warning("No data available for Unemployment Rate.")
+    st.warning("No data available for Employment Population Ratio.")
 
 # Optionally, display raw data for each dataset
 st.subheader("Raw Data: Total Nonfarm Employment")
@@ -83,7 +85,6 @@ st.write(bls_labor_force)
 
 st.subheader("Raw Data: Unemployment Rate")
 st.write(unemployment_rate)
-
 
 st.subheader("Raw Data: Employment Population Ratio")
 st.write(employment_population_ratio)
