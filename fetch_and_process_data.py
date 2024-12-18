@@ -3,11 +3,11 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-# API key and BLS endpoint URL
-api_key = "86b67e98f5134a7386ce62902a756492"  # Replace with your actual API key
+#This is the API key and URL from the Labor
+api_key = "86b67e98f5134a7386ce62902a756492"  
 url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
-# Define the series IDs (e.g., non-farm workers, labor force participation, unemployment rate)
+# I am changing the names of the ids to what the actual data is to make it easier to read the graphics, and know what the series code is measuring
 series_ids = [
     "SMS31000000000000001",  # Total nonfarm NE
     "LASST370000000000008",  # Labor force participation NC
@@ -15,7 +15,7 @@ series_ids = [
     "LAUST310000000000007" #Employment-Population Ratio: Nebraska (U
 ]
 
-# File paths for saving the data
+# The csv files I am using
 data_files = {
     "bls_data": "bls_data.csv",
     "bls_labor_force": "bls_labor_force.csv",
@@ -23,7 +23,7 @@ data_files = {
     "employment_population_ratio": "employment_population_ratio.csv"
 }
 
-# Function to fetch data from BLS API
+# fetching the data
 def fetch_bls_data(start_year, end_year):
     payload = {
         "seriesid": series_ids,
@@ -44,11 +44,10 @@ def fetch_bls_data(start_year, end_year):
 
     return None
 
-# Function to process the fetched data and return a DataFrame
 def process_bls_data(data):
     all_data = []
 
-    # Process data for each series
+    # data being processed for each of the data sets
     for series in data["Results"]["series"]:
         series_id = series["seriesID"]
         for item in series["data"]:
@@ -61,31 +60,31 @@ def process_bls_data(data):
 
     return pd.DataFrame(all_data)
 
-# Function to save processed data into CSV files
+# Saving the datasets
 def save_data_to_csv(data, file_path):
     data.to_csv(file_path, index=False)
 
-# Load the existing data if available, or initialize an empty DataFrame
+
 def load_data(file_path):
     if os.path.exists(file_path):
         return pd.read_csv(file_path)
     else:
         return pd.DataFrame(columns=["series_id", "date", "value"])
 
-# Function to update data: fetch new data and save it to CSV
+
 def update_data():
     # Set the start and end years for fetching data
     start_year = 2022  # You can change this if needed
     end_year = datetime.now().year
 
-    # Fetch the data
+
     new_data = fetch_bls_data(start_year, end_year)
     
     if new_data:
         # Process the fetched data
         processed_data = process_bls_data(new_data)
         
-        # Save data for each dataset separately
+
         # Saving Total Nonfarm data
         total_nonfarm_data = processed_data[processed_data["series_id"] == "SMS31000000000000001"]
         save_data_to_csv(total_nonfarm_data, data_files["bls_data"])
@@ -106,6 +105,6 @@ def update_data():
     else:
         print("No new data fetched.")
 
-# Main function to run the update
+
 if __name__ == "__main__":
     update_data()
