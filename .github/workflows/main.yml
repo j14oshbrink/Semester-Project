@@ -1,14 +1,14 @@
-name: Deploy Streamlit App
+name: Update Dataset and Trigger Streamlit App
 
 on:
   push:
     branches:
-      - main 
+      - main
   schedule:
-    - cron: '0 0 1 * *'  
+    - cron: '0 0 1 * *'
 
 jobs:
-  update-dashboard:
+  update-dataset:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +29,10 @@ jobs:
       run: |
         python fetch_and_process_data.py  
 
-    - name: Deploy to Streamlit
+    - name: Commit updated data
       run: |
-        streamlit run semester_project_code.py
-
+        git config user.name "j14oshbrink"
+        git config user.email "joshuabrink@unomaha.edu"
+        git add bls_data.csv bls_labor_force.csv employment_population_ratio.csv unemployment_rate.csv
+        git commit -m "Update datasets for $(date '+%Y-%m-%d')"
+        git push
