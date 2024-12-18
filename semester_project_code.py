@@ -62,8 +62,8 @@ else:
 st.subheader("employment_population_ratio.csv")
 if not employment_population_ratio.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
-    for series_id in employmnet_population_ratio["series_id"].unique():
-        series_data = employmnet_population_ratio[employmnet_population_ratio["series_id"] == series_id]
+    for series_id in employment_population_ratio["series_id"].unique():
+        series_data = employment_population_ratio[employment_population_ratio["series_id"] == series_id]
         ax.plot(pd.to_datetime(series_data["date"]), series_data["value"], label=series_id)
     ax.set_title('Employment Population Ratio')
     ax.set_xlabel('Date')
