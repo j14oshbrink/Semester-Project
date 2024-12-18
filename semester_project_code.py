@@ -58,6 +58,21 @@ if not unemployment_rate.empty:
     st.pyplot(fig)
 else:
     st.warning("No data available for Unemployment Rate.")
+    
+st.subheader("employmnet_population_ratio.csv")
+if not employmnet_population_ratio.empty:
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for series_id in employmnet_population_ratio["series_id"].unique():
+        series_data = employmnet_population_ratio[employmnet_population_ratio["series_id"] == series_id]
+        ax.plot(pd.to_datetime(series_data["date"]), series_data["value"], label=series_id)
+    ax.set_title('Employment Population Ratio')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Unemployment Rate (%)')
+    ax.legend()
+    ax.grid(True)
+    st.pyplot(fig)
+else:
+    st.warning("No data available for Unemployment Rate.")
 
 # Optionally, display raw data for each dataset
 st.subheader("Raw Data: Total Nonfarm Employment")
@@ -68,3 +83,7 @@ st.write(bls_labor_force)
 
 st.subheader("Raw Data: Unemployment Rate")
 st.write(unemployment_rate)
+
+
+st.subheader("Raw Data: Employment Population Ratio)
+st.write(Employment population ratio)
