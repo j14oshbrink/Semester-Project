@@ -104,7 +104,3 @@ def update_data():
         print("Data updated and saved successfully.")
     else:
         print("No new data fetched.")
-
-
-if __name__ == "__main__":
-    update_data()
