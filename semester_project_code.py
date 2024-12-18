@@ -59,7 +59,7 @@ if not unemployment_rate.empty:
 else:
     st.warning("No data available for Unemployment Rate.")
     
-st.subheader("employmnet_population_ratio.csv")
+st.subheader("employment_population_ratio.csv")
 if not employment_population_ratio.empty:
     fig, ax = plt.subplots(figsize=(12, 6))
     for series_id in employmnet_population_ratio["series_id"].unique():
