@@ -85,5 +85,5 @@ st.subheader("Raw Data: Unemployment Rate")
 st.write(unemployment_rate)
 
 
-st.subheader("Raw Data: Employment Population Ratio)
+st.subheader("Raw Data: Employment Population Ratio")
 st.write(Employment population ratio)
